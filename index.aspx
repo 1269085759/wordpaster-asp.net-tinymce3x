@@ -12,9 +12,9 @@
     <script type="text/javascript" src="WordPaster/js/w.edge.js" charset="utf-8"></script>
     <script type="text/javascript" src="WordPaster/js/w.app.js" charset="utf-8"></script>
     <script type="text/javascript" src="WordPaster/js/w.file.js" charset="utf-8"></script>
-    <script type="text/javascript" src="WordPaster/js/WordPaster.js" charset="utf-8"></script>
-    <script type="text/javascript" src="WordPaster/js/skygqbox.js" charset="utf-8"></script>
 	<script type="text/javascript" src="tiny_mce/tiny_mce.js"></script>
+    <script type="text/javascript" src="WordPaster/js/skygqbox.js" charset="utf-8"></script>
+    <script type="text/javascript" src="WordPaster/js/WordPaster.js" charset="utf-8"></script>
 </head>
 <body>
 	<div style=" font-size:medium; line-height:130%;">
