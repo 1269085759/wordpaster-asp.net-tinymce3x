@@ -1,4 +1,4 @@
-/*
+﻿/*
 	版权所有 2009-2015 荆门泽优软件有限公司 保留所有版权。
 	邮箱:1085617561@qq.com
 	描述:Word图片上传控件
@@ -32,7 +32,8 @@ var WordPasterConfig = {
 	, "LogFile"			    : "f:\\log.txt"//日志文件路径
 	, "PasteWordType"	    : ""	//粘贴WORD的图片格式。JPG/PNG/GIF/BMP，推荐使用JPG格式，防止出现大图片。
 	, "PasteImageType"	    : ""	//粘贴文件，剪帖板的图片格式，为空表示本地图片格式。JPG/PNG/GIF/BMP
-	, "JpgQuality"		    : "100"	//JPG质量。0~100
+	, "PasteImgSrc"		    : ""	//shape:优先使用源公式图片，img:使用word自动生成的图片
+    , "JpgQuality"		    : "100"	//JPG质量。0~100
 	, "QueueCount"		    : "5"	//同时上传线程数
 	, "CryptoType"		    : "uuid"//名称计算方式,md5,crc,sha1,uuid，其中uuid为随机名称
 	, "ThumbWidth"		    : "0"	//缩略图宽度。0表示不使用缩略图
@@ -40,12 +41,12 @@ var WordPasterConfig = {
 	, "AppPath"			    : ""
 	, "Cookie"			    : ""
     , "Servers"             :[{"url":"www.ncmem.com"},{"url":"www.xproerui.com"}]//内部服务器地址(不下载此地址中的图片)
-	, "IcoError"            : "http://www.ncmem.com/products/word-imagepaster/fckeditor2461/WordPaster/error.png"
-    , "IcoUploader"         : "http://www.ncmem.com/products/word-imagepaster/fckeditor2461/WordPaster/upload.gif"
+	, "IcoError"            : "http://www.ncmem.com/products/word-imagepaster/ckeditor353/WordPaster/error.png"
+    , "IcoUploader"         : "http://www.ncmem.com/products/word-imagepaster/ckeditor353/WordPaster/upload.gif"
 	, "PostUrl"			    : "http://www.ncmem.com/products/word-imagepaster/fckeditor2461/asp.net/upload.aspx"
     //x86
 	, "ClsidParser"		    : "2404399F-F06B-477F-B407-B8A5385D2C5E"
-	, "CabPath"			    : "http://www.ncmem.com/download/WordPaster2/WordPaster.cab"
+	, "CabPath"			    : "http://localhost:83/WordPaster.cab"
 	//x64
 	, "ClsidParser64"		: "7C3DBFA4-DDE6-438A-BEEA-74920D90764B"
 	, "CabPath64"			: "http://www.ncmem.com/download/WordPaster2/WordPaster64.cab"
@@ -164,13 +165,12 @@ function WordPasterManager()
     {
         this.app.postMessage = this.app.postMessageEdge;
 	}
-    this.setup_tip = function ()
-    {
+    this.setup_tip = function () {
         this.ui.setup.skygqbox();
         var dom = this.ui.setup.html("控件加载中，如果未加载成功请先<a name='w-exe'>安装控件</a>");
         var lnk = dom.find('a[name="w-exe"]');
         lnk.attr("href", this.Config["ExePath"]);
-    }
+    };
     this.need_update = function ()
     {
         var dom = this.ui.setup.html("发现新版本，请<a name='w-exe' href='#'>更新</a>");
@@ -332,14 +332,9 @@ function WordPasterManager()
 	this.SetEditor = function (edt)
 	{
 	    _this.Editor = edt;
-	    //_this.WordPaster.Editor = edt;
-	    //_this.ImagePaster.Editor = edt;
-
-        //非chrome 45才挂载事件，因为chrome 45无法立即判断剪帖板数据
-	    if(!this.chrome45)this.LoadPasteEvent(edt);
 	};
 
-    //点击按钮进行粘贴
+    //粘贴命令
 	this.Paste = function ()
 	{
 	    if (!this.setuped)
@@ -361,6 +356,16 @@ function WordPasterManager()
 	    }
 	};
 
+    //单击按钮粘贴
+	this.PasteManual = function ()
+	{
+	    if (!this.setuped)
+        {
+            this.setup_tip(); return;
+        }
+        this.app.paste();
+	};
+
     //上传网络图片
 	this.UploadNetImg = function ()
 	{
@@ -371,10 +376,10 @@ function WordPasterManager()
     //加载粘贴事件	
 	this.LoadPasteEvent = function (edt)
 	{
-	    //edt.Events.AttachEvent('OnPaste', function()
-	    //{
-	    //	return _this.Paste();
-	    //});
+	    edt.on('paste', function (evt)
+	    {
+            _this.Paste(evt);
+	    });
 	};
 
 	/*
